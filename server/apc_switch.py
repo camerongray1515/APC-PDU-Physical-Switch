@@ -6,9 +6,10 @@ import time
 username = "apc"
 password = "apc"
 hostname = "10.0.2.161"
-serial_device = "/dev/ttyACM3"
+serial_device = "/dev/ttyUSB0"
 baud_rate = 9600
-controlled_outlet = 8
+switched_outlet = 8
+default_off_outlets = [6, 7]
 # END CONFIG
 
 # Menu options
@@ -22,6 +23,13 @@ PROMPT = b">"
 
 def main():
     serial = Serial(serial_device, baudrate=baud_rate)
+
+    telnet = Telnet(hostname)
+    login(telnet)
+    for outlet in default_off_outlets:
+        control_outlet(telnet, outlet, IMMEDIATE_OFF)
+    telnet.close()
+
     previous_state = ""
     last_changed_time = 0
     while True:
