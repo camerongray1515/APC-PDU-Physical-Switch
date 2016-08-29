@@ -3,10 +3,10 @@ from serial import Serial
 import time
 
 # BEGIN CONFIG
-username = "apc"
-password = "apc"
-hostname = "10.0.2.161"
-serial_device = "/dev/ttyUSB0"
+username = "script"
+password = "EXAMPLE PASSWORD"
+hostname = "10.0.0.4"
+serial_device = "/dev/cuaU0"
 baud_rate = 9600
 switched_outlet = 8
 default_off_outlets = [6, 7]
@@ -15,7 +15,7 @@ default_off_outlets = [6, 7]
 # Menu options
 DEVICE_MANAGER = b"1\r\n"
 CONTROL_OUTLET = b"1\r\n"
-OUTLET_CONTROL = b"3\r\n"
+OUTLET_CONTROL = b"2\r\n"
 IMMEDIATE_ON = b"1\r\n"
 IMMEDIATE_OFF = b"2\r\n"
 IMMEDIATE_REBOOT = b"3\r\n"
@@ -40,7 +40,7 @@ def main():
             action = IMMEDIATE_ON if state == "on" else IMMEDIATE_OFF
             telnet = Telnet(hostname)
             login(telnet)
-            control_outlet(telnet, controlled_outlet, action)
+            control_outlet(telnet, switched_outlet, action)
             telnet.close()
             last_changed_time = time.time()
 
@@ -57,8 +57,6 @@ def control_outlet(t, outlet, method):
     t.write(OUTLET_CONTROL)
     t.read_until(PROMPT)
     t.write(str(outlet).encode("ascii") + b"\r\n")
-    t.read_until(PROMPT)
-    t.write(CONTROL_OUTLET)
     t.read_until(PROMPT)
     t.write(method)
     t.read_until(b"Enter 'YES' to continue")
